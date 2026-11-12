@@ -16,24 +16,6 @@ python dashboard.py --port COM6
 
 `python dashboard.py --demo` runs it without the board.
 
-## Before flashing `main.c`
-
-| Setting | What to check |
-|---|---|
-| `ACS_DIV_I`, `ACS_DIV_A` | Divider ratio between each ACS712 OUT and its ADC pin (`R_bottom / (R_top + R_bottom)`, `1.0` if wired directly). Sensor I uses 10 kΩ + 20 kΩ = `0.6667`. |
-| `A_SIGN` | Sensor A must read +ve when the AHF pushes current in the direction sensor I reads +ve. If grid THD **rises** when AHF is ACTIVE, flip it. |
-| `AHF_SENSE_GRID` | `0` if sensor I measures the load current before the injection point, `1` if it measures the already-compensated grid current. |
-| `AHF_INJ_RATIO` | Coupling-transformer ratio; `1` for direct injection. |
-| `AHF_VDC`, `AHF_L_H`, `AHF_R_OHM` | Only a starting guess; the firmware measures the real values. |
-| `RELAY_SSR_MASK` | Bit set = that pin drives an active-HIGH SSR (default `0x4`: PB2). Clear = 5 V active-LOW relay module. |
-| `PF_TARGET` | 0.99: AUTO switches a step in whenever it brings PF closer. |
-| `RELAY_MIN_ON_MS`, `CAP_RECLOSE_MS` | 5 s minimum ON and OFF time for each capacitor. |
-| `VI_LPF_HZ` | Zero-phase Butterworth smoothing (1.5 kHz) of the voltage and current waveforms shown on the dashboard. Display only: all measured values come from the raw samples. |
-| `I_DEADBAND` | 0.02 A. The grid-current rms has the sensor noise (~30 mA rms, shown in the ADC diagnostics) removed first, so no load reads 0 while small loads still read correctly. |
-| `V_DEADBAND` | 20 V: below this the mains is treated as OFF (sensor noise reads ~6 V with no mains). |
-| `A_LPF_HZ`, `A_DEADBAND` | Butterworth low-pass and noise floor for the AHF current sensor (ACS712 #2). |
-| `RELAY_SYNC`, `RELAY_T_OP_MS`, `RELAY_T_REL_MS` | Relay modules open just before and close at the voltage peak, so a capacitor without a bleeder resistor is reconnected with ~0 V across the contacts. |
-
 ## Capacitor bank safety
 
 * Fit a **bleeder resistor across every capacitor**: 2.5 µF → 820 kΩ, 10 µF → 220 kΩ, 20 µF → 100 kΩ (1 W, ≥ 400 V rated). Without it the capacitor stays charged for minutes and the relay closes onto up to 650 V, which welds its contacts.
